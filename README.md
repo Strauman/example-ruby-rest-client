@@ -3,7 +3,7 @@ Ruby example client for SMS Global REST API
 
 Requirements
 --------------------------------
- - Ruby 1.9.2 or above
+ - Ruby 1.9.3 or above
 
 
 Preparation & Compile
