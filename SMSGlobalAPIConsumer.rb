@@ -29,8 +29,8 @@ apiHost = "api.smsglobal.com"
 apiPort = 80
 apiVersion = "v1"
 extraData = ""
-unless ssl === true then
-    protocol = 'https'
+if ssl == true then
+    protocol = "https"
     apiPort = 443
 end
 
@@ -38,6 +38,7 @@ wrapper = SMSGlobalAPIWrapper.new(key, secret, protocol, apiHost, apiPort, apiVe
 
 # Get Balance
 begin
+    puts "\nGetting Balance .."
     balanceData = wrapper.get("balance")
     balance = JSON.parse(balanceData)
     puts "Your balance is: #{balance['balance']}"
