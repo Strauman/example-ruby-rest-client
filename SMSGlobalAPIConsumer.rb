@@ -1,10 +1,39 @@
+#!/usr/bin/env ruby
 # SMS GLobal
 # http://smsglobal.com
 
 require "./SMSGlobalAPIWrapper.rb"
+require 'optparse'
+require 'json'
 
-key = "2237275ba354517bdbd2477b7266e3c1"
-secret = "ccbb84e115a66eb2fc83834b8c0f31a3"
-wrapper = SMSGlobalAPIWrapper.new(key, secret, "http", "api.local", "80", "v1", "")
+options = {}
+OptionParser.new do |opts|
+  opts.banner =
+    "usage: #{$0} [OPTIONS] [ARG ...]"
 
-wrapper.get("balance")
+  opts.on("-v", "--verbose") do |arg|
+    options[:verbose] = arg
+  end
+end.parse!
+
+verbose = options[:verbose]
+key = ARGV[0]
+secret = ARGV[1]
+
+# Open the gate :)
+wrapper = SMSGlobalAPIWrapper.new(key, secret, "http", "api.local", "80", "v1", "", verbose)
+
+# Get Balance
+begin
+    balanceData = wrapper.get("balance")
+    balance = JSON.parse(balanceData)
+    puts "Your balance is: #{balance['balance']}"
+    puts "Country code: #{balance['countryCode']}"
+    puts "Cost per SMS: #{balance['costPerSms']}"
+    puts "Cost per MMS: #{balance['costPerMms']}"
+    puts "SMS available: #{balance['smsAvailable']}"
+    puts "MMS available: #{balance['mmsAvailable']}"
+rescue
+    puts "Error getting balance"
+end
+

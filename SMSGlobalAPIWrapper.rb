@@ -1,5 +1,6 @@
 # SMS GLobal
 # http://smsglobal.com
+# @author Huy Dinh <huy.dinh@smsglobal.com>
 
 require "date"
 require "time"
@@ -10,14 +11,15 @@ require "net/http"
 
 class SMSGlobalAPIWrapper
 
-    def initialize(key, secret, protocol = "http", host = "api.smsglobal.com", port = "80", apiVersion = "v1", extraData = "")
+    def initialize(key, secret, protocol = "http", host = "api.smsglobal.com", port = "80", apiVersion = "v1", extraData = "", debug = false)
         @key = key
         @secret = secret
-        @protocol = protocol
+        @protocol = protocol.downcase
         @host = host
         @port = port
         @apiVersion = apiVersion
         @extraData = extraData
+        @debug = debug
     end
 
     def get(action, id = nil)
@@ -40,30 +42,40 @@ class SMSGlobalAPIWrapper
                 action = "#{action}/id/#{id}"
             end
 
-            headers = {
-                "Authorization" => getAuthorisationHTTPHeader(method, action)
-            }
             uri = URI.parse(%Q{#{@protocol}://#{@host}:#{@port}/#{@apiVersion}#{action}})
 
+            # Set up request metadata
             case method
                 when "POST"
-                    request = Net::HTTP::Post.new(uri.path, headers)
+                    request = Net::HTTP::Post.new(uri.path)
                 when "GET"
-                    request = Net::HTTP::Get.new(uri.path, headers)
+                    request = Net::HTTP::Get.new(uri.path)
                 when "DELETE"
-                    request = Net::HTTP::Delete.new(uri.path, headers)
+                    request = Net::HTTP::Delete.new(uri.path)
                 else #use GET
-                    request = Net::HTTP::Get.new(uri.path, headers)
+                    request = Net::HTTP::Get.new(uri.path)
             end
+            request["Authorization"] = getAuthorisationHTTPHeader(method, action)
 
+            # HTTP transportation
             http = Net::HTTP.new(uri.host, uri.port)
-            http.set_debug_output($stdout)
 
-            #the data is available...
-            http.get(uri.path, headers) do |chunk|
-                #provided the data is good, print it...
-                print chunk unless chunk =~ />416.+Range/
+            if @protocol == "https" then
+                http.use_ssl = true
             end
+
+            if @debug then
+                http.set_debug_output($stdout)
+            end
+
+            # do it!
+            response = http.request(request)
+
+            unless !response.is_a?(Net::HTTPSuccess) then
+                return response.body
+            else
+                raise "There's problem accessing API"
+            end;
         end
 
         def getAuthorisationHTTPHeader(method, action)
