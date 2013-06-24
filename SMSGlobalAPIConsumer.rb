@@ -8,20 +8,33 @@ require 'json'
 
 options = {}
 OptionParser.new do |opts|
-  opts.banner =
-    "usage: #{$0} [OPTIONS] [ARG ...]"
+    opts.banner = "usage: #{$0} [OPTIONS] [ARG ...]"
 
-  opts.on("-v", "--verbose") do |arg|
-    options[:verbose] = arg
-  end
+    opts.on("-v", "--verbose") do |arg|
+        options[:verbose] = arg
+    end
+    opts.on("-s", "--ssl") do |arg|
+        options[:ssl] = arg
+    end
 end.parse!
 
 verbose = options[:verbose]
+ssl = options[:ssl]
 key = ARGV[0]
 secret = ARGV[1]
 
 # Open the gate :)
-wrapper = SMSGlobalAPIWrapper.new(key, secret, "http", "api.local", "80", "v1", "", verbose)
+protocol = "http"
+apiHost = "api.smsglobal.com"
+apiPort = 80
+apiVersion = "v1"
+extraData = ""
+unless ssl === true then
+    protocol = 'https'
+    apiPort = 443
+end
+
+wrapper = SMSGlobalAPIWrapper.new(key, secret, protocol, apiHost, apiPort, apiVersion, extraData, verbose)
 
 # Get Balance
 begin

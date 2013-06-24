@@ -62,6 +62,7 @@ class SMSGlobalAPIWrapper
 
             if @protocol == "https" then
                 http.use_ssl = true
+                http.verify_mode = OpenSSL::SSL::VERIFY_NONE # Dangerous, should not use for PRODUCTION
             end
 
             if @debug then
