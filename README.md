@@ -30,10 +30,14 @@ Usage:
 Notes:
  * [1] Find your \<APIKey\> and \<Secret\> from within MXT at http://mxt.smsglobal.com/api-key.
  * [2] We're disabling SSL Certificate Verification for ease of development and less braincells burned, please consider turn in it back on by commenting out the following line
-                 http.verify_mode = OpenSSL::SSL::VERIFY_NONE # Dangerous, should not use for PRODUCTION
 
+``` ruby
+   # SMSGlobalAPIWrapper.rb
+   http.verify_mode = OpenSSL::SSL::VERIFY_NONE # Dangerous, should not use for PRODUCTION
+```
 
 The result would look like this 
+
 ~~~
     ./SMSGlobalAPIConsumer.rb 2237275ba354517bdbd2477b7266e3c1 ccbb84e115a66eb2fc83834b8c0f31a3 -v
 
